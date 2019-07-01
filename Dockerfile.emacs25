@@ -12,9 +12,22 @@ RUN apt-get update \
     firefox \
     && rm -rf /var/lib/apt/lists/*
 
+RUN apt-get update \
+    && apt-get install software-properties-common \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN add-apt-repository ppa:alessandro-strada/ppa
+RUN apt-get update \
+    && apt-get install google-drive-ocamlfuse \
+    && rm -rf /var/lib/apt/lists/*
+
+
 COPY .spacemacs "${UHOME}/.spacemacs"
 COPY private "${UHOME}/.emacs.d/private"
 
 # Install layers dependencies and initialize the user
 RUN install-deps
 
+RUN google-drive-ocamlfuse
+
+# CMD ["bash", "-c", "/bin/bash"]
