@@ -8,8 +8,18 @@ services:
     container_name: spacemacs
     build:
       context: .
+      dockerfile: Dockerfile.emacs25
     environment:
       - UNAME=${UNAME}
       - UID=${UID}
+      - DISPLAY=${DISPLAY}
+      # - TZ=<your_time_zone>
     volumes:
-      - ${WORKSPACE}:/mnt/workspace
+      - /tmp/.X11-unix:/tmp/.X11-unix:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/machine-id:/etc/machine-id:ro
+      - /var/run/dbus:/var/run/dbus
+      - ./.spacemacs:/home/emacs/.spacemacs
+      # - ${WORKSPACE}:/mnt/workspace
+    # stdin_open: true
+    # tty: true
