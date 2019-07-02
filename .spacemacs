@@ -460,15 +460,15 @@ before packages are loaded."
   (setq global-visual-line-mode t)
 
   ;; Basic org  vars
-  (setq org-directory "~/GoogleDrive/notes"
+  (setq org-directory "~/GoogleDrive/notes")
         ;; org-agenda-files (file-expand-wildcards "~/GoogleDrive/notes/*")
-        org-agenda-file-regexp "\\`[^.].*\\.org\\'"
+  (setq org-agenda-file-regexp "\\`[^.].*\\.org\\'"
         org-agenda-files (apply 'append
 			                          (mapcar
 			                            (lambda (directory)
 				                            (directory-files-recursively
 				                             directory org-agenda-file-regexp))
-			                            '("~/GoogleDrive/notes/")))
+			                            (list org-directory)))
         org-log-done t
         org-startup-indented t
         org-export-backends '("org" "ascii" "html" "icalendar" "latex" "odt")
@@ -527,20 +527,32 @@ before packages are loaded."
           ))
 
   ;; Define the custum capture templates
+  (setq org-default-notes-file (concat org-directory "/refile.org"))
   (setq org-capture-templates
         '(("t" "todo" entry (file org-default-notes-file)
 	         "* TODO %?\n%u\n%a\n" :clock-in t :clock-resume t)
-	        ("m" "Meeting" entry (file org-default-notes-file)
+          ("r" "respond" entry (file org-default-notes-file)
+           "* NEXT Respond to %:from on %:subject\nSCHEDULED: %t\n%U\n%a\n" :clock-in t :clock-resume t :immediate-finish t)
+          ("n" "note" entry (file org-default-notes-file)
+           "* %? :NOTE:\n%U\n%a\n" :clock-in t :clock-resume t)
+          ("j" "Journal" entry (file+datetree (concat org-directory "/diary.org"))
+           "* %?\n%U\n" :clock-in t :clock-resume t)
+          ("w" "org-protocol" entry (file org-default-notes-file)
+           "* TODO Review %c\n%U\n" :immediate-finish t)
+          ("m" "Meeting" entry (file org-default-notes-file)
 	         "* MEETING with %? :MEETING:\n%t" :clock-in t :clock-resume t)
-	        ("d" "Diary" entry (file+datetree "~/org/diary.org")
-	         "* %?\n%U\n" :clock-in t :clock-resume t)
 	        ("i" "Idea" entry (file org-default-notes-file)
 	         "* %? :IDEA: \n%t" :clock-in t :clock-resume t)
-	        ("n" "Next Task" entry (file+headline org-default-notes-file "Tasks")
-	         "** NEXT %? \nDEADLINE: %t") ))
+	        ;; ("n" "Next Task" entry (file+headline org-default-notes-file "Tasks")
+	         ;; "** NEXT %? \nDEADLINE: %t")
+          ("p" "Phone call" entry (file org-default-notes-file)
+           "* PHONE %? :PHONE:\n%U" :clock-in t :clock-resume t)
+          ("h" "Habit" entry (file org-default-notes-file)
+           "* NEXT %?\n%U\n%a\nSCHEDULED: %(format-time-string \"%<<%Y-%m-%d %a .+1d/3d>>\")\n:PROPERTIES:\n:STYLE: habit\n:REPEAT_TO_STATE: NEXT\n:END:\n")
+          ))
 
   ;; Configure org-brain
-  (setq org-brain-path "/home/piyush/GoogleDrive/notes")
+  (setq org-brain-path org-directory)
   ;; For Evil users
   (with-eval-after-load 'evil
     (evil-set-initial-state 'org-brain-visualize-mode 'emacs))
@@ -553,7 +565,8 @@ before packages are loaded."
   (setq org-brain-visualize-default-choices 'all)
   (setq org-brain-title-max-length 12)
 
-  )
+
+)
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
